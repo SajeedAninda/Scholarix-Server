@@ -41,6 +41,11 @@ async function run() {
             let { tuitionMin, tuitionMax, countries, field, scholarship, searchText, degrees } = req.query;
             let filter = {};
 
+            let pageQuery = parseInt(req.query.page);
+            let pageNumber = pageQuery;
+            let perPageData = 6;
+            let skip = pageNumber * perPageData;
+
             if (tuitionMin && tuitionMax) {
                 filter.tuition_fees = { $gte: parseFloat(tuitionMin), $lte: parseFloat(tuitionMax) };
             }
@@ -69,12 +74,18 @@ async function run() {
             }
 
             try {
-                const result = await courseCollection.find(filter).toArray();
+                const result = await courseCollection.find(filter).skip(skip).limit(perPageData).toArray();
                 res.send(result);
             } catch (error) {
                 console.error("Error fetching course details:", error);
                 res.status(500).send("Internal Server Error");
             }
+        })
+
+        // GET ESTIMATED DOCUMENT COUNT OF COURSE COLLECTION FOR PAGINATION 
+        app.get("/coursesCount", async (req, res) => {
+            let count = await courseCollection.estimatedDocumentCount();
+            res.send({ count });
         })
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
