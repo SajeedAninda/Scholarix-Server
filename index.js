@@ -36,57 +36,53 @@ async function run() {
             res.send(result);
         })
 
-        // GET COURSE DETAILS WITH PARALLEL FILTERING
+        // GET COURSE DETAILS WITH PARALLEL FILTERING 
         app.get("/courseDetails", async (req, res) => {
-            let { tuitionMin, tuitionMax, countries, field, scholarship, searchText, degrees } = req.query;
-            let filter = {};
-
-            let pageQuery = parseInt(req.query.page);
-            let pageNumber = pageQuery;
-            let perPageData = 6;
-            let skip = pageNumber * perPageData;
-
-            if (tuitionMin && tuitionMax) {
-                filter.tuition_fees = { $gte: parseFloat(tuitionMin), $lte: parseFloat(tuitionMax) };
-            }
-
-            if (countries && countries !== 'allCountry') {
-                filter.country_name = countries;
-            }
-
-            if (degrees && degrees !== 'allDegrees') {
-                filter.degree_name = degrees;
-            }
-
-            if (field && field !== 'allField') {
-                filter.field_name = field;
-            }
-
-            if (scholarship && scholarship !== 'allScholarship') {
-                filter.available_scholarship = scholarship;
-            }
-
-            if (searchText) {
-                filter.$or = [
-                    { course_name: { $regex: new RegExp(searchText, 'i') } },
-                    { university_name: { $regex: new RegExp(searchText, 'i') } }
-                ];
-            }
-
             try {
+                let { tuitionMin, tuitionMax, countries, field, scholarship, searchText, degrees } = req.query;
+                let filter = {};
+        
+                let pageQuery = parseInt(req.query.page);
+                let pageNumber = pageQuery;
+                let perPageData = 6;
+                let skip = pageNumber * perPageData;
+        
+                if (tuitionMin && tuitionMax) {
+                    filter.tuition_fees = { $gte: parseFloat(tuitionMin), $lte: parseFloat(tuitionMax) };
+                }
+        
+                if (countries && countries !== 'allCountry') {
+                    filter.country_name = countries;
+                }
+        
+                if (degrees && degrees !== 'allDegrees') {
+                    filter.degree_name = degrees;
+                }
+        
+                if (field && field !== 'allField') {
+                    filter.field_name = field;
+                }
+        
+                if (scholarship && scholarship !== 'allScholarship') {
+                    filter.available_scholarship = scholarship;
+                }
+        
+                if (searchText) {
+                    filter.$or = [
+                        { course_name: { $regex: new RegExp(searchText, 'i') } },
+                        { university_name: { $regex: new RegExp(searchText, 'i') } }
+                    ];
+                }
+        
                 const result = await courseCollection.find(filter).skip(skip).limit(perPageData).toArray();
-                res.send(result);
+                const count = await courseCollection.countDocuments(filter);
+        
+                res.send({ result, count });
             } catch (error) {
                 console.error("Error fetching course details:", error);
                 res.status(500).send("Internal Server Error");
             }
-        })
-
-        // GET ESTIMATED DOCUMENT COUNT OF COURSE COLLECTION FOR PAGINATION 
-        app.get("/coursesCount", async (req, res) => {
-            let count = await courseCollection.estimatedDocumentCount();
-            res.send({ count });
-        })
+        });
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
