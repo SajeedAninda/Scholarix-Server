@@ -38,7 +38,7 @@ async function run() {
 
         // GET COURSE DETAILS WITH PARALLEL FILTERING
         app.get("/courseDetails", async (req, res) => {
-            let { tuitionMin, tuitionMax, countries, degree, scholarship, searchText } = req.query;
+            let { tuitionMin, tuitionMax, countries, field, scholarship, searchText, degrees } = req.query;
             let filter = {};
 
             if (tuitionMin && tuitionMax) {
@@ -49,8 +49,12 @@ async function run() {
                 filter.country_name = countries;
             }
 
-            if (degree && degree !== 'allDegree') {
-                filter.field_name = degree;
+            if (degrees && degrees !== 'allDegrees') {
+                filter.degree_name = degrees;
+            }
+
+            if (field && field !== 'allField') {
+                filter.field_name = field;
             }
 
             if (scholarship && scholarship !== 'allScholarship') {
