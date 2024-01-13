@@ -36,9 +36,41 @@ async function run() {
             res.send(result);
         })
 
+        // GET COURSE DETAILS WITH PARALLEL FILTERING
         app.get("/courseDetails", async (req, res) => {
-            let result = await courseCollection.find().toArray();
-            res.send(result);
+            let { tuitionMin, tuitionMax, countries, degree, scholarship, searchText } = req.query;
+            let filter = {};
+
+            if (tuitionMin && tuitionMax) {
+                filter.tuition_fees = { $gte: parseFloat(tuitionMin), $lte: parseFloat(tuitionMax) };
+            }
+
+            if (countries && countries !== 'allCountry') {
+                filter.country_name = countries;
+            }
+
+            if (degree && degree !== 'allDegree') {
+                filter.field_name = degree;
+            }
+
+            if (scholarship && scholarship !== 'allScholarship') {
+                filter.available_scholarship = scholarship;
+            }
+
+            if (searchText) {
+                filter.$or = [
+                    { course_name: { $regex: new RegExp(searchText, 'i') } },
+                    { university_name: { $regex: new RegExp(searchText, 'i') } }
+                ];
+            }
+
+            try {
+                const result = await courseCollection.find(filter).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error("Error fetching course details:", error);
+                res.status(500).send("Internal Server Error");
+            }
         })
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
