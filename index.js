@@ -9,7 +9,7 @@ app.use(express.json());
 const port = process.env.PORT || 5000
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `${process.env.MONGO_URI}`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -41,48 +41,73 @@ async function run() {
             try {
                 let { tuitionMin, tuitionMax, countries, field, scholarship, searchText, degrees } = req.query;
                 let filter = {};
-        
+
                 let pageQuery = parseInt(req.query.page);
                 let pageNumber = pageQuery;
                 let perPageData = 6;
                 let skip = pageNumber * perPageData;
-        
+
                 if (tuitionMin && tuitionMax) {
                     filter.tuition_fees = { $gte: parseFloat(tuitionMin), $lte: parseFloat(tuitionMax) };
                 }
-        
+
                 if (countries && countries !== 'allCountry') {
                     filter.country_name = countries;
                 }
-        
+
                 if (degrees && degrees !== 'allDegrees') {
                     filter.degree_name = degrees;
                 }
-        
+
                 if (field && field !== 'allField') {
                     filter.field_name = field;
                 }
-        
+
                 if (scholarship && scholarship !== 'allScholarship') {
                     filter.available_scholarship = scholarship;
                 }
-        
+
                 if (searchText) {
                     filter.$or = [
                         { course_name: { $regex: new RegExp(searchText, 'i') } },
                         { university_name: { $regex: new RegExp(searchText, 'i') } }
                     ];
                 }
-        
+
                 const result = await courseCollection.find(filter).skip(skip).limit(perPageData).toArray();
                 const count = await courseCollection.countDocuments(filter);
-        
+
                 res.send({ result, count });
             } catch (error) {
                 console.error("Error fetching course details:", error);
                 res.status(500).send("Internal Server Error");
             }
         });
+
+        // GET COURSE DETAILS BY SPECIFIC COURSE ID
+        app.get("/courseDetails/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await courseCollection.findOne(query);
+            res.send(result);
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
