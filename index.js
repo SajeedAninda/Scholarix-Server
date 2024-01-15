@@ -92,6 +92,11 @@ async function run() {
             res.send(result);
         })
 
+        // API TO GET ALL COURSES 
+        app.get("/allCourses", async (req, res) => {
+            let result = await courseCollection.find().toArray();
+            res.send(result);
+        })
 
 
 
