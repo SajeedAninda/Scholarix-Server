@@ -106,7 +106,34 @@ async function run() {
             res.send(result);
         })
 
-        
+        app.patch("/updateCourse/:id", async (req, res) => {
+            const id = req.params.id;
+            const course = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedCourse = {
+                $set: {
+                    course_name: course.course_name,
+                    university_name: course.university_name,
+                    degree_name: course.degree_name,
+                    field_name: course.field_name,
+                    country_name: course.country_name,
+                    city_name: course.city_name,
+                    tuition_fees: course.tuition_fees,
+                    available_scholarship: course.available_scholarship,
+                    scholarship_amount: course.scholarship_amount,
+                    intake_time: course.intake_time,
+                    application_deadline: course.application_deadline,
+                    posted_time: course.posted_time
+                },
+            };
+            const result = await courseCollection.updateOne(
+                filter,
+                updatedCourse,
+                options
+            );
+            res.send(result);
+        });
 
 
 
