@@ -145,6 +145,14 @@ async function run() {
             res.send(result);
         })
 
+        // GET SINGLE COUNTRY BY ID
+        app.get("/detailedCountry/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await countryCollection.findOne(query);
+            res.send(result);
+        })
+
 
 
 
