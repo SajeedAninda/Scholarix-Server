@@ -27,7 +27,10 @@ async function run() {
         // await client.connect();
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
+
+        // DATABASE COLLECTIONS 
         const courseCollection = client.db("Scholarix").collection("courses");
+        const countryCollection = client.db("Scholarix").collection("countryDetails");
 
         // POST COURSE DETAILED DATA 
         app.post("/courses", async (req, res) => {
@@ -136,6 +139,11 @@ async function run() {
         });
 
 
+        // GET ALL COUNTRY DETAILS
+        app.get("/countryDetails", async (req, res) => {
+            let result = await countryCollection.find().toArray();
+            res.send(result);
+        })
 
 
 
