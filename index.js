@@ -153,7 +153,11 @@ async function run() {
             res.send(result);
         })
 
-
+        // GET LATEST COURSES BY ADDED TIME
+        app.get("/latestCourses", async (req, res) => {
+            let result = await courseCollection.find().sort({ posted_time: -1 }).limit(6).toArray();
+            res.send(result);
+        })
 
 
 
