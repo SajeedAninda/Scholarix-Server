@@ -167,6 +167,12 @@ async function run() {
             res.send(result);
         })
 
+        // API TO GET CONSULTANTS DETAILS 
+        app.get("/getConsultants", async (req, res) => {
+            let result = await consultantCollection.find().toArray();
+            res.send(result);
+        })
+
 
 
 
