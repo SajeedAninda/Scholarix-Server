@@ -31,6 +31,7 @@ async function run() {
         // DATABASE COLLECTIONS 
         const courseCollection = client.db("Scholarix").collection("courses");
         const countryCollection = client.db("Scholarix").collection("countryDetails");
+        const consultantCollection = client.db("Scholarix").collection("consultants");
 
         // POST COURSE DETAILED DATA 
         app.post("/courses", async (req, res) => {
@@ -159,7 +160,12 @@ async function run() {
             res.send(result);
         })
 
-
+        // POST CONSULTANT DATA TO COLLECTION 
+        app.post("/consultant", async (req, res) => {
+            let consultantData = req.body;
+            let result = await consultantCollection.insertOne(consultantData);
+            res.send(result);
+        })
 
 
 
