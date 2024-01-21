@@ -181,6 +181,14 @@ async function run() {
             res.send(result);
         })
 
+        // API TO DELETE A CONSULTANT 
+        app.delete("/deleteConsultant/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await consultantCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
 
 
