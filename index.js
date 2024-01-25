@@ -32,6 +32,7 @@ async function run() {
         const courseCollection = client.db("Scholarix").collection("courses");
         const countryCollection = client.db("Scholarix").collection("countryDetails");
         const consultantCollection = client.db("Scholarix").collection("consultants");
+        const bookmarksCollection = client.db("Scholarix").collection("bookmarks");
 
         // POST COURSE DETAILED DATA 
         app.post("/courses", async (req, res) => {
@@ -189,8 +190,20 @@ async function run() {
             res.send(result);
         })
 
+        // API TO ADD TO BOOKMARK 
+        app.post("/bookmarks", async (req, res) => {
+            let bookmarkData = req.body;
+            let existingBookmark = await bookmarksCollection.findOne({
+                _id: bookmarkData._id,
+                currentUserEmail: bookmarkData.currentUserEmail
+            });
 
-
+            if (existingBookmark) {
+                return res.status(400).send({ error: "Bookmark already exists." });
+            }
+            let result = await bookmarksCollection.insertOne(bookmarkData);
+            res.send(result);
+        });
 
 
 
