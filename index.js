@@ -213,6 +213,14 @@ async function run() {
             res.send(result);
         })
 
+        // API TO DELETE BOOKMARK 
+        app.delete("/deleteBookmark/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await bookmarksCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
 
 
