@@ -194,7 +194,7 @@ async function run() {
         app.post("/bookmarks", async (req, res) => {
             let bookmarkData = req.body;
             let existingBookmark = await bookmarksCollection.findOne({
-                _id: bookmarkData._id,
+                courseId: bookmarkData.courseId,
                 currentUserEmail: bookmarkData.currentUserEmail
             });
 
@@ -205,6 +205,13 @@ async function run() {
             res.send(result);
         });
 
+        // API TO GET BOOKMARKED COURSES FOR PARTICULAR USER 
+        app.get("/getBookmarkedCourses/:userEmail", async (req, res) => {
+            let email = req.params.userEmail
+            let query = { currentUserEmail: email };
+            let result = await bookmarksCollection.find(query).toArray();
+            res.send(result);
+        })
 
 
 
