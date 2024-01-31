@@ -222,11 +222,23 @@ async function run() {
             res.send(result);
         })
 
-        app.post("/addBooking", async (req, res) => {
+        // API TO BOOK CONSULTANT 
+        app.post('/addBooking', async (req, res) => {
             let bookingDetails = req.body;
+            let existingBooking = await bookingCollection.findOne({
+                consultantId: bookingDetails.consultantId,
+                selectedDate: bookingDetails.selectedDate,
+                bookingUserEmail: bookingDetails.bookingUserEmail,
+            });
+
+            if (existingBooking) {
+                return res.status(400).json({ error: 'Consultant is already booked on this date' });
+            }
+
             let result = await bookingCollection.insertOne(bookingDetails);
             res.send(result);
-        })
+        });
+
 
 
 
