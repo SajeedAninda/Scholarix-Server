@@ -33,6 +33,7 @@ async function run() {
         const countryCollection = client.db("Scholarix").collection("countryDetails");
         const consultantCollection = client.db("Scholarix").collection("consultants");
         const bookmarksCollection = client.db("Scholarix").collection("bookmarks");
+        const bookingCollection = client.db("Scholarix").collection("bookings");
 
         // POST COURSE DETAILED DATA 
         app.post("/courses", async (req, res) => {
@@ -218,6 +219,12 @@ async function run() {
             let id = req.params.id;
             let query = { _id: new ObjectId(id) };
             let result = await bookmarksCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        app.post("/addBooking", async (req, res) => {
+            let bookingDetails = req.body;
+            let result = await bookingCollection.insertOne(bookingDetails);
             res.send(result);
         })
 
