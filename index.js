@@ -227,11 +227,21 @@ async function run() {
             res.send(result);
         })
 
-
         let trxId = new ObjectId().toString();
         // API TO BOOK CONSULTANT 
         app.post('/addBooking', async (req, res) => {
             let bookingDetails = req.body;
+            let existingBooking = await bookingCollection.findOne({
+                "bookingDetails.consultantId": bookingDetails.consultantId,
+                "bookingDetails.selectedDate": bookingDetails.selectedDate,
+                "bookingDetails.bookingUserEmail": bookingDetails.bookingUserEmail,
+                paidStatus: true,
+            });
+
+            if (existingBooking) {
+                return res.status(400).json({ error: 'Consultant is already booked on this date' });
+            }
+
             let consultant = await consultantCollection.findOne({ _id: new ObjectId(bookingDetails.consultantId) });
 
             const data = {
@@ -246,7 +256,23 @@ async function run() {
                 product_name: consultant.fullName,
                 product_category: 'Consultant',
                 product_profile: consultant.expertise,
-                cus_email: bookingDetails.bookingUserEmail
+                cus_name: 'Customer Name',
+                cus_email: bookingDetails.bookingUserEmail,
+                cus_add1: 'Dhaka',
+                cus_add2: 'Dhaka',
+                cus_city: 'Dhaka',
+                cus_state: 'Dhaka',
+                cus_postcode: '1000',
+                cus_country: 'Bangladesh',
+                cus_phone: '01711111111',
+                cus_fax: '01711111111',
+                ship_name: 'Customer Name',
+                ship_add1: 'Dhaka',
+                ship_add2: 'Dhaka',
+                ship_city: 'Dhaka',
+                ship_state: 'Dhaka',
+                ship_postcode: 1000,
+                ship_country: 'Bangladesh',
             };
             const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
             sslcz.init(data).then(apiResponse => {
@@ -281,19 +307,16 @@ async function run() {
                 }
             })
 
-            // let existingBooking = await bookingCollection.findOne({
-            //     consultantId: bookingDetails.consultantId,
-            //     selectedDate: bookingDetails.selectedDate,
-            //     bookingUserEmail: bookingDetails.bookingUserEmail,
-            // });
-
-            // if (existingBooking) {
-            //     return res.status(400).json({ error: 'Consultant is already booked on this date' });
-            // }
-
             // let result = await bookingCollection.insertOne(bookingDetails);
             // res.send(result);
         });
+
+
+        // GET ALL BOOKINGS 
+        app.get("/getBookings", async (req, res) => {
+            let result = await bookingCollection.find().toArray();
+            res.send(result);
+        })
 
 
 
