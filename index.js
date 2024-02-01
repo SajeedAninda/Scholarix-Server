@@ -227,42 +227,26 @@ async function run() {
             res.send(result);
         })
 
+
         let trxId = new ObjectId().toString();
         // API TO BOOK CONSULTANT 
         app.post('/addBooking', async (req, res) => {
             let bookingDetails = req.body;
             let consultant = await consultantCollection.findOne({ _id: new ObjectId(bookingDetails.consultantId) });
-            // console.log(consultant);
 
             const data = {
                 total_amount: consultant.charge,
                 currency: 'USD',
                 tran_id: trxId, // use unique tran_id for each api call
                 success_url: `http://localhost:5000/payment/success/${trxId}`,
-                fail_url: 'http://localhost:3030/fail',
+                fail_url: `http://localhost:5000/payment/failed/${trxId}`,
                 cancel_url: 'http://localhost:3030/cancel',
                 ipn_url: 'http://localhost:3030/ipn',
                 shipping_method: consultant.availability,
                 product_name: consultant.fullName,
                 product_category: 'Consultant',
                 product_profile: consultant.expertise,
-                cus_name: 'Customer Name',
-                cus_email: bookingDetails.bookingUserEmail,
-                cus_add1: 'Dhaka',
-                cus_add2: 'Dhaka',
-                cus_city: 'Dhaka',
-                cus_state: 'Dhaka',
-                cus_postcode: '1000',
-                cus_country: 'Bangladesh',
-                cus_phone: '01711111111',
-                cus_fax: '01711111111',
-                ship_name: 'Customer Name',
-                ship_add1: 'Dhaka',
-                ship_add2: 'Dhaka',
-                ship_city: 'Dhaka',
-                ship_state: 'Dhaka',
-                ship_postcode: 1000,
-                ship_country: 'Bangladesh',
+                cus_email: bookingDetails.bookingUserEmail
             };
             const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
             sslcz.init(data).then(apiResponse => {
@@ -287,6 +271,13 @@ async function run() {
                 })
                 if (result.modifiedCount > 0) {
                     res.redirect(`http://localhost:5173/payment/success/${req.params.tranId}`)
+                }
+            })
+
+            app.post("/payment/failed/:tranId", async (req, res) => {
+                let result = await bookingCollection.deleteOne({ transaction_id: req.params.tranId });
+                if (result.deletedCount) {
+                    res.redirect(`http://localhost:5173/payment/failed/${req.params.tranId}`)
                 }
             })
 
