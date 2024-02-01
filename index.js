@@ -306,17 +306,20 @@ async function run() {
                     res.redirect(`http://localhost:5173/payment/failed/${req.params.tranId}`)
                 }
             })
-
-            // let result = await bookingCollection.insertOne(bookingDetails);
-            // res.send(result);
         });
 
 
-        // GET ALL BOOKINGS 
-        app.get("/getBookings", async (req, res) => {
-            let result = await bookingCollection.find().toArray();
+        // GET USER SPECIFIC BOOKINGS 
+        app.get("/userAppointments/:currentUserEmail", async (req, res) => {
+            const currentUserEmail = req.params.currentUserEmail;
+            let result = await bookingCollection.find({
+                "bookingDetails.bookingUserEmail": currentUserEmail,
+                "paidStatus": true
+            }).toArray();
+
             res.send(result);
-        })
+        });
+
 
 
 
