@@ -39,6 +39,7 @@ async function run() {
         const consultantCollection = client.db("Scholarix").collection("consultants");
         const bookmarksCollection = client.db("Scholarix").collection("bookmarks");
         const bookingCollection = client.db("Scholarix").collection("bookings");
+        const userCollection = client.db("Scholarix").collection("users");
 
         // POST COURSE DETAILED DATA 
         app.post("/courses", async (req, res) => {
@@ -320,6 +321,12 @@ async function run() {
             res.send(result);
         });
 
+        // POST USER DATA TO DATABASE WHILE REGISTER 
+        app.post("/userRegister", async (req, res) => {
+            let user = req.body;
+            let result = await userCollection.insertOne(user);
+            res.send(result);
+        })
 
 
 
