@@ -4,7 +4,9 @@ const SSLCommerzPayment = require('sslcommerz-lts')
 const app = express()
 require('dotenv').config()
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://scholarix.netlify.app', 'http://localhost:5173', 'http://localhost:5174']
+}));
 app.use(express.json());
 
 const port = process.env.PORT || 5000
@@ -325,14 +327,14 @@ async function run() {
                     }
                 })
                 if (result.modifiedCount > 0) {
-                    res.redirect(`http://localhost:5173/payment/success/${req.params.tranId}`)
+                    res.redirect(`https://scholarix.netlify.app/success/${req.params.tranId}`)
                 }
             })
 
             app.post("/payment/failed/:tranId", async (req, res) => {
                 let result = await bookingCollection.deleteOne({ transaction_id: req.params.tranId });
                 if (result.deletedCount) {
-                    res.redirect(`http://localhost:5173/payment/failed/${req.params.tranId}`)
+                    res.redirect(`https://scholarix.netlify.app/failed/${req.params.tranId}`)
                 }
             })
         });
