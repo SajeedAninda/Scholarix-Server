@@ -197,6 +197,34 @@ async function run() {
             res.send(result);
         })
 
+        // API TO UPDATE CONSULTANT DATA 
+        app.patch("/updateConsultant/:id", async (req, res) => {
+            const id = req.params.id;
+            const consultantData = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedCourse = {
+                $set: {
+                    fullName: consultantData.fullName,
+                    qualification: consultantData.qualification,
+                    expertise: consultantData.expertise,
+                    experience: consultantData.experience,
+                    email: consultantData.email,
+                    phoneNumber: consultantData.phoneNumber,
+                    bio: consultantData.bio,
+                    charge: consultantData.charge,
+                    availability: consultantData.availability,
+                    specialization: consultantData.specialization
+                },
+            };
+            const result = await consultantCollection.updateOne(
+                filter,
+                updatedCourse,
+                options
+            );
+            res.send(result);
+        });
+
         // API TO ADD TO BOOKMARK 
         app.post("/bookmarks", async (req, res) => {
             let bookmarkData = req.body;
