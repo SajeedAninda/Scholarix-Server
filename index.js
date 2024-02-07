@@ -4,9 +4,7 @@ const SSLCommerzPayment = require('sslcommerz-lts')
 const app = express()
 require('dotenv').config()
 
-app.use(cors({
-    origin: ['https://scholarix.netlify.app', 'http://localhost:5173', 'http://localhost:5174']
-}));
+app.use(cors());
 app.use(express.json());
 
 const port = process.env.PORT || 5000
@@ -279,8 +277,8 @@ async function run() {
                 total_amount: consultant.charge,
                 currency: 'USD',
                 tran_id: trxId, // use unique tran_id for each api call
-                success_url: `http://localhost:5000/payment/success/${trxId}`,
-                fail_url: `http://localhost:5000/payment/failed/${trxId}`,
+                success_url: `https://scholarix-server.vercel.app/payment/success/${trxId}`,
+                fail_url: `https://scholarix-server.vercel.app/payment/failed/${trxId}`,
                 cancel_url: 'http://localhost:3030/cancel',
                 ipn_url: 'http://localhost:3030/ipn',
                 shipping_method: consultant.availability,
@@ -327,14 +325,14 @@ async function run() {
                     }
                 })
                 if (result.modifiedCount > 0) {
-                    res.redirect(`https://scholarix.netlify.app/success/${req.params.tranId}`)
+                    res.redirect(`https://scholarix.netlify.app/payment/success/${req.params.tranId}`)
                 }
             })
 
             app.post("/payment/failed/:tranId", async (req, res) => {
                 let result = await bookingCollection.deleteOne({ transaction_id: req.params.tranId });
                 if (result.deletedCount) {
-                    res.redirect(`https://scholarix.netlify.app/failed/${req.params.tranId}`)
+                    res.redirect(`https://scholarix.netlify.app/payment/failed/${req.params.tranId}`)
                 }
             })
         });
